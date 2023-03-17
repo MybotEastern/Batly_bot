@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<launch>
+<!-- run serial node for base mega -->   
+ 
+  <node pkg="rosserial_arduino" name="rosserial" type="serial_node.py" respawn="true" output="screen">
+        <param name="port" value="/dev/ttyACM0" />
+        <param name="baud" value="57600" />
+    </node>
+    <!-- Publish lidar  -->
+    <include file="$(find ydlidar_ros_driver)/launch/X2.launch" />
+    <!-- Publish  odometry -->
+    <node pkg="kv01" name="odome" type="kv01"/>
+    <!-- Publish  hector_slam -->
+    <include file="$(find hector_slam_launch)/launch/tutorial.launch" />
+
+    
+</launch>
+

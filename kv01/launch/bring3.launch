@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<launch>
+<!-- run serial node for base mega -->  
+  <master auto="start"/>
+  <param name ="use_sim_time" value="false"/>
+
+  <node pkg="rosserial_arduino" name="rosserial" type="serial_node.py" respawn="true" output="screen">
+        <param name="port" value="/dev/ttyACM0" />
+        <param name="baud" value="57600" />
+    </node>
+
+   <!-- Publish lidar  -->
+    <include file="$(find ydlidar_ros_driver)/launch/X2.launch" />
+
+    <!--- Setup tramformation --> 
+	<node pkg="tf" type="static_transform_publisher" name="base_footprint_to_base_link" args="0.0 0 0.10 0 0 0 /base_footprint /base_link 100" />
+        <!--node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 1 map odom 100" /-->
+    
+    <!-- Publish  odometry -->
+    <node pkg="kv01" name="odome" type="kv01" output="screen" />
+
+   <!--- Run the map server --> 
+
+    <node  pkg="map_server" type="map_server" name="map_server"  args="/home/kv1/kv1/src/kv01/map/map7.yaml"/>
+    
+   <!-- Publish  hector_slam -->
+    <!--include file="$(find hector_slam_launch)/launch/tutorial.launch" /-->
+   
+  <!--- Run AMCL --> 
+  <include file="$(find amcl)/examples/amcl_omni.launch"/>
+   <!--arg name="scan_topic" default="scan"/-->
+
+  <!--- Run move base --> 
+
+	<node pkg="move_base" type="move_base" respawn="true" name="move_base" output="screen">
+        <rosparam command="load" file="$(find kv01)/param/movebase/costmap_common_params.yaml" ns="global_costmap"/>
+        <rosparam command="load" file="$(find kv01)/param/movebase/costmap_common_params.yaml" ns="local_costmap"/>
+        <rosparam command="load" file="$(find kv01)/param/movebase/local_costmap_params.yaml"/>
+        <rosparam command="load" file="$(find kv01)/param/movebase/global_costmap_params.yaml"/>
+        <rosparam command="load" file="$(find kv01)/param/movebase/base_local_planner_holonomic_params.yaml"/>
+        <rosparam command="load" file="$(find kv01)/param/movebase/move_base_params.yaml"/> 
+      </node>
+
+
+</launch> 
+    
+

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+
+<launch>
+<!-- run serial node for base mega -->    
+ 
+    <node pkg="rosserial_arduino" name="rosserial" type="serial_node.py" output="screen">
+        <param name="port" value="/dev/ttyACM0" />
+        <param name="baud" value="57600" />
+    </node>
+    
+
+    <include file="$(find ydlidar_ros_driver)/launch/X2.launch" />
+    <!-- Publish Linorobot odometry -->
+    <node pkg="kv01" name="odome" type="kv01"/>
+    
+    <!-- Odom-IMU Extended Kalman Filter-->
+    <!--node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization"> 
+        <rosparam command="load" file="$(find kv01)/param/ekf/robot_localization.yaml" />
+        <remap from="odometry/filtered" to="odom" /></node-->
+
+     <!--node pkg="tf" type="static_transform_publisher" name="map_nav_broadcaster" args="0 0 0 0 0 0 map nav 100"/-->
+     <node pkg ="tf" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 /map /odom 40"/>
+     <!--node pkg ="tf" type="static_transform_publisher" name="odom_to_base_link" args="0.0 0.0 0.0 0.0 0.0 0.0 /odom /base_link 40"/-->
+     <node pkg ="tf" type="static_transform_publisher" name="base_footprint_to_base_link" args="0.0 0 0.0 0 0 0  /base_footprint /base_link 40"/>
+     <!--node pkg="tf" type="static_transform_publisher" name="base_footprint_to_base_link" args="0.0 0.0 0.0 0.0 0.0 0.0 /base_footprint /base_link  40" /-->
+    <!--node pkg="tf" type="static_transform_publisher" name="base_link_to_laser" args="0.2 0.0 0.12 0.0 0.0 0.0 /base_link /laser 40" /-->
+    
+    
+     <include file="$(find hector_mapping)/launch/mapping_default.launch" />
+     <node pkg="rviz" name="rviz" type="rviz" args="-d $(find ydlidar_ros_driver)/launch/lidar.rviz" />
+     <include file="$(find hector_geotiff)/launch/geotiff_mapper.launch" />
+
+     
+
+     
+
+</launch>
+

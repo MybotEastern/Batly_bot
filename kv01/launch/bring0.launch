@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<launch>
+<!-- run serial node for base mega -->    
+ 
+    <node pkg="rosserial_arduino" name="rosserial" type="serial_node.py" output="screen">
+        <param name="port" value="/dev/ttyACM0" />
+        <param name="baud" value="57600" />
+    </node>
+    
+    <include file="$(find ydlidar_ros_driver)/launch/X2.launch" />
+    <!-- Publish Linorobot odometry -->
+    <node pkg="kv01" name="odome" type="kv01"/>
+    <node pkg ="tf" type="static_transform_publisher" name="base_footprint_to_base_link" args="0.0 0 0.0 0 0 0  /base_footprint /base_link 40"/>
+  
+
+</launch>
+
